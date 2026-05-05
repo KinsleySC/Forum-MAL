@@ -1,0 +1,77 @@
+<div class="home-layout">
+  <!-- Sidebar: filters -->
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <h3 class="sidebar-title">Categories</h3>
+      <a href="/" class="filter-link {{#if activeCategory}}{{else}}active{{/if}}">All</a>
+      {{#each categories}}
+        <a href="/?category={{id}}" class="filter-link" data-cat="{{id}}">{{name}}</a>
+      {{/each}}
+    </div>
+
+    {{#if user}}
+    <div class="sidebar-section">
+      <h3 class="sidebar-title">My Feed</h3>
+      <a href="/?filter=mine" class="filter-link" data-filter="mine">My Posts</a>
+      <a href="/?filter=liked" class="filter-link" data-filter="liked">Liked Posts</a>
+    </div>
+    {{/if}}
+  </aside>
+
+  <!-- Main content -->
+  <div class="feed">
+    <div class="feed-header">
+      <h1>Posts</h1>
+      {{#if user}}
+        <a href="/post/new" class="btn btn-primary">+ New Post</a>
+      {{/if}}
+    </div>
+
+    {{#if hasPosts}}
+      {{#each posts}}
+        <article class="post-card">
+          <div class="post-card-votes">
+            <form method="POST" action="/vote/post/{{id}}">
+              <input type="hidden" name="value" value="1">
+              <button type="submit" class="vote-btn {{#if userVote}}{{else}}{{/if}}" data-vote="{{userVote}}" data-dir="up">▲</button>
+            </form>
+            <span class="vote-count">{{likes}}</span>
+            <form method="POST" action="/vote/post/{{id}}">
+              <input type="hidden" name="value" value="-1">
+              <button type="submit" class="vote-btn" data-vote="{{userVote}}" data-dir="down">▼</button>
+            </form>
+            <span class="vote-count dislike-count">{{dislikes}}</span>
+          </div>
+          <div class="post-card-body">
+            <div class="post-card-meta">
+              <span class="post-author">{{username}}</span>
+              <span class="post-time">{{timeAgo}}</span>
+            </div>
+            <a href="/post/{{id}}" class="post-card-title">{{title}}</a>
+            <p class="post-card-excerpt">{{content}}</p>
+            <div class="post-card-footer">
+              <div class="post-tags">
+                {{#each categories}}
+                  <span class="tag">{{name}}</span>
+                {{/each}}
+              </div>
+              <span class="comment-count">💬 {{commentCount}}</span>
+            </div>
+          </div>
+          {{#if image_path}}
+            <div class="post-card-image">
+              <img src="{{image_path}}" alt="" loading="lazy">
+            </div>
+          {{/if}}
+        </article>
+      {{/each}}
+    {{else}}
+      <div class="empty-state">
+        <p>No posts yet.</p>
+        {{#if user}}
+          <a href="/post/new" class="btn btn-primary">Create the first post</a>
+        {{/if}}
+      </div>
+    {{/if}}
+  </div>
+</div>

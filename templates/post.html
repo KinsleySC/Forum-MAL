@@ -1,0 +1,104 @@
+<div class="post-page">
+  <a href="/" class="back-link">← Back to posts</a>
+
+  <article class="post-full">
+    <div class="post-full-header">
+      <div class="post-full-meta">
+        <span class="post-author">{{post.username}}</span>
+        <span class="post-time">{{post.timeAgo}}</span>
+        {{#if post.isOwner}}
+          <a href="/post/{{post.id}}/edit" class="btn btn-ghost btn-xs">Edit</a>
+          <form method="POST" action="/post/{{post.id}}/delete" class="inline-form" onsubmit="return confirm('Delete this post?')">
+            <button type="submit" class="btn btn-danger btn-xs">Delete</button>
+          </form>
+        {{/if}}
+      </div>
+      <h1>{{post.title}}</h1>
+      <div class="post-tags">
+        {{#each post.categories}}
+          <a href="/?category={{id}}" class="tag">{{name}}</a>
+        {{/each}}
+      </div>
+    </div>
+
+    {{#if post.hasImage}}
+      <div class="post-image">
+        <img src="{{post.image_path}}" alt="Post image">
+      </div>
+    {{/if}}
+
+    <div class="post-content">
+      {{{post.contentHtml}}}
+    </div>
+
+    <div class="post-actions">
+      <form method="POST" action="/vote/post/{{post.id}}" class="inline-form">
+        <input type="hidden" name="value" value="1">
+        <button type="submit" class="vote-btn-lg" data-vote="{{post.userVote}}" data-dir="up">
+          ▲ <span>{{post.likes}}</span>
+        </button>
+      </form>
+      <form method="POST" action="/vote/post/{{post.id}}" class="inline-form">
+        <input type="hidden" name="value" value="-1">
+        <button type="submit" class="vote-btn-lg" data-vote="{{post.userVote}}" data-dir="down">
+          ▼ <span>{{post.dislikes}}</span>
+        </button>
+      </form>
+    </div>
+  </article>
+
+  <!-- Comments Section -->
+  <section class="comments-section" id="comments">
+    <h2>Comments ({{post.commentCount}})</h2>
+
+    {{#if user}}
+      <form method="POST" action="/post/{{post.id}}/comment" class="comment-form">
+        <div class="form-group">
+          <textarea name="content" rows="3" placeholder="Write a comment..." required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary btn-sm">Comment</button>
+      </form>
+    {{/if}}
+
+    {{#if post.hasComments}}
+      <div class="comments-list">
+        {{#each post.comments}}
+          <div class="comment-card">
+            <div class="comment-meta">
+              <span class="comment-author">{{username}}</span>
+              <span class="comment-time">{{timeAgo}}</span>
+              {{#if isOwner}}
+                <button class="btn btn-ghost btn-xs edit-comment-btn" data-id="{{id}}" data-content="{{content}}">Edit</button>
+                <form method="POST" action="/comment/{{id}}/delete" class="inline-form" onsubmit="return confirm('Delete this comment?')">
+                  <button type="submit" class="btn btn-danger btn-xs">Delete</button>
+                </form>
+              {{/if}}
+            </div>
+            <p class="comment-content">{{content}}</p>
+            <div class="comment-actions">
+              <form method="POST" action="/vote/comment/{{id}}" class="inline-form">
+                <input type="hidden" name="value" value="1">
+                <button type="submit" class="vote-btn-sm" data-vote="{{userVote}}" data-dir="up">▲ {{likes}}</button>
+              </form>
+              <form method="POST" action="/vote/comment/{{id}}" class="inline-form">
+                <input type="hidden" name="value" value="-1">
+                <button type="submit" class="vote-btn-sm" data-vote="{{userVote}}" data-dir="down">▼ {{dislikes}}</button>
+              </form>
+            </div>
+
+            <!-- Hidden edit form -->
+            <form method="POST" action="/comment/{{id}}/edit" class="edit-comment-form" id="edit-comment-{{id}}" style="display:none;">
+              <textarea name="content" rows="2">{{content}}</textarea>
+              <div class="form-actions-inline">
+                <button type="button" class="btn btn-ghost btn-xs cancel-edit">Cancel</button>
+                <button type="submit" class="btn btn-primary btn-xs">Save</button>
+              </div>
+            </form>
+          </div>
+        {{/each}}
+      </div>
+    {{else}}
+      <p class="empty-comments">No comments yet. Be the first to share your thoughts!</p>
+    {{/if}}
+  </section>
+</div>

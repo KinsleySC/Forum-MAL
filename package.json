@@ -1,0 +1,14 @@
+{
+  "name": "forum",
+  "version": "1.0.0",
+  "description": "Forum web complet avec Node.js vanilla et SQLite",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "sql.js": "^1.14.1",
+    "uuid": "^9.0.0"
+  }
+}

@@ -1,0 +1,44 @@
+<div class="form-page">
+  <div class="form-card">
+    <h1>New Post</h1>
+
+    {{#if error}}
+      <div class="alert alert-error">{{error}}</div>
+    {{/if}}
+
+    <form method="POST" action="/post/new" enctype="multipart/form-data" class="post-form">
+      <div class="form-group">
+        <label for="title">Title</label>
+        <input type="text" id="title" name="title" required autofocus placeholder="An interesting title...">
+      </div>
+
+      <div class="form-group">
+        <label for="content">Content</label>
+        <textarea id="content" name="content" rows="8" required placeholder="What's on your mind?"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Categories</label>
+        <div class="checkbox-grid">
+          {{#each categories}}
+            <label class="checkbox-label">
+              <input type="checkbox" name="categories" value="{{id}}">
+              <span>{{name}}</span>
+            </label>
+          {{/each}}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="image">Image (optional)</label>
+        <input type="file" id="image" name="image" accept="image/jpeg,image/png,image/gif,image/webp">
+        <small class="form-hint">Max 20 MB — JPEG, PNG, GIF, WebP</small>
+      </div>
+
+      <div class="form-actions">
+        <a href="/" class="btn btn-ghost">Cancel</a>
+        <button type="submit" class="btn btn-primary">Publish</button>
+      </div>
+    </form>
+  </div>
+</div>
