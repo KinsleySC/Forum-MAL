@@ -28,6 +28,10 @@ router.post('/post/:id/comment', (req, res, params) => posts.addComment(req, res
 router.post('/comment/:id/edit', (req, res, params) => posts.editComment(req, res, params));
 router.post('/comment/:id/delete', (req, res, params) => posts.deleteComment(req, res, params));
 router.post('/vote/:type/:id', (req, res, params) => posts.vote(req, res, params));
+router.post('/post/:postId/comment/:commentId/reply', (req, res, params) => posts.replyComment(req, res, params));
+router.get('/messages', (req, res) => posts.inboxPage(req, res));
+router.get('/messages/:userId', (req, res, params) => posts.conversationPage(req, res, params));
+router.post('/messages/:userId', (req, res, params) => posts.sendMessage(req, res, params));
 const server = http.createServer(async (req, res) => {
   try {
     if (req.url.startsWith('/static/')) {

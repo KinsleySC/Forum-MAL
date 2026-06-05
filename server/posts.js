@@ -369,13 +369,14 @@ async function editComment(req, res, params) {
 
   const body = await parseBody(req);
   const content = (body.content || '').trim();
-  if (!content) return redirect(res, '/');
 
   const d = db.get();
   const comment = d.get('SELECT * FROM comments WHERE id = ? AND user_id = ?', [parseInt(params.id), user.id]);
   if (!comment) {
     return sendHTML(res, renderTemplate('error', { user, error: { code: 403, message: 'Accès refusé' } }), 403);
   }
+
+  if (!content) return redirect(res, `/post/${comment.post_id}#comments`);
 
   d.run('UPDATE comments SET content = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?', [content, parseInt(params.id)]);
   redirect(res, `/post/${comment.post_id}#comments`);

@@ -29,7 +29,7 @@
         </div>
         <span class="field-error" id="su-confirm-err"></span>
 
-        <button type="submit" class="btn-slider-primary">Se déconnecter</button>
+        <button type="submit" class="btn-slider-primary">S'inscrire</button>
       </form>
     </div>
 
@@ -159,8 +159,7 @@
     if (!ok) e.preventDefault();
   });
 
-  var serverPanel = '{{panel}}';
-  if (window.location.href.indexOf('panel=signup') !== -1 || serverPanel === 'signup') {
+  if (window.location.search.indexOf('panel=signup') !== -1) {
     container.classList.add('right-panel-active');
   }
 </script>

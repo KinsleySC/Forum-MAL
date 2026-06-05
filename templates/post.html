@@ -94,6 +94,21 @@
                 <button type="submit" class="btn btn-primary btn-xs">Save</button>
               </div>
             </form>
+
+            {{#if hasReply}}
+              <div class="comment-reply">
+                <span class="reply-author">↳ {{reply.username}}</span>
+                <span class="reply-time">{{reply.timeAgo}}</span>
+                <p class="reply-content">{{reply.content}}</p>
+              </div>
+            {{/if}}
+
+            {{#if canReply}}
+              <form method="POST" action="/post/{{post.id}}/comment/{{id}}/reply" class="reply-form">
+                <textarea name="content" rows="2" placeholder="Répondre à ce commentaire..."></textarea>
+                <button type="submit" class="btn btn-ghost btn-xs">Répondre</button>
+              </form>
+            {{/if}}
           </div>
         {{/each}}
       </div>

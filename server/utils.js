@@ -286,8 +286,13 @@ const MIME_TYPES = {
 
 function serveStatic(req, res) {
   const url = req.url.split('?')[0];
-  const filePath = path.join(__dirname, '..', url);
+  const staticRoot = path.resolve(path.join(__dirname, '..', 'static'));
+  const filePath = path.resolve(path.join(__dirname, '..', url));
   const ext = path.extname(filePath);
+
+  if (!filePath.startsWith(staticRoot + path.sep) && filePath !== staticRoot) {
+    return false;
+  }
 
   if (!fs.existsSync(filePath) || !fs.statSync(filePath).isFile()) {
     return false;
