@@ -4,7 +4,6 @@ class Router {
   }
 
   add(method, path, handler) {
-    // Convert path params like :id to regex groups
     const paramNames = [];
     const pattern = path.replace(/:([a-zA-Z_]+)/g, (_, name) => {
       paramNames.push(name);

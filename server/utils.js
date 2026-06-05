@@ -2,7 +2,6 @@ const fs = require('fs');
 const path = require('path');
 const { v4: uuidv4 } = require('uuid');
 
-// ── Cookie helpers ──
 function parseCookies(req) {
   const cookies = {};
   const header = req.headers.cookie || '';
@@ -26,7 +25,6 @@ function setCookie(res, name, value, options = {}) {
   res.setHeader('Set-Cookie', arr);
 }
 
-// ── URL-encoded body parser ──
 function parseBody(req) {
   return new Promise((resolve, reject) => {
     const chunks = [];
@@ -62,7 +60,6 @@ function parseBody(req) {
   });
 }
 
-// ── Multipart form parser (for image uploads) ──
 function parseMultipart(req) {
   return new Promise((resolve, reject) => {
     const ct = req.headers['content-type'] || '';
@@ -97,7 +94,6 @@ function parseMultipartBuffer(buffer, boundary) {
     const part = parts[i];
     if (part.length < 4) continue;
 
-    // Remove leading \r\n
     let start = 0;
     if (part[0] === 0x0d && part[1] === 0x0a) start = 2;
 
@@ -107,7 +103,6 @@ function parseMultipartBuffer(buffer, boundary) {
     const headerStr = part.slice(start, headerEnd).toString();
     const bodyStart = headerEnd + 4;
 
-    // Remove trailing \r\n--
     let bodyEnd = part.length;
     if (part[bodyEnd - 2] === 0x0d && part[bodyEnd - 1] === 0x0a) bodyEnd -= 2;
 
@@ -166,7 +161,6 @@ function bufferIndexOf(buf, search, offset = 0) {
   return -1;
 }
 
-// ── Simple template engine ──
 function renderTemplate(templateName, data = {}) {
   const layoutPath = path.join(__dirname, '..', 'templates', 'layout.html');
   const pagePath = path.join(__dirname, '..', 'templates', `${templateName}.html`);
@@ -181,7 +175,6 @@ function renderTemplate(templateName, data = {}) {
 function render(tpl, data) {
   tpl = processBlocks(tpl, data);
 
-  // Triple-brace raw values first, so they don't get re-matched by the escaped pattern
   tpl = tpl.replace(/\{\{\{([\w.]+)\}\}\}/g, (_, varName) => {
     const val = resolveVar(data, varName);
     return val != null ? String(val) : '';
@@ -205,7 +198,6 @@ function processBlocks(tpl, data) {
     const startIdx = m.index;
     const openLen = m[0].length;
 
-    // Find the matching close, tracking nesting of the same tag type only
     const tagRe = new RegExp(`\\{\\{#${tag}\\s+[\\w.]+\\}\\}|\\{\\{\\/${tag}\\}\\}`, 'g');
     tagRe.lastIndex = startIdx + openLen;
     let depth = 1;
@@ -220,7 +212,6 @@ function processBlocks(tpl, data) {
       }
     }
     if (closeIdx === -1) {
-      // Unmatched open tag — strip it to avoid infinite loop
       tpl = tpl.slice(0, startIdx) + tpl.slice(startIdx + openLen);
       continue;
     }
@@ -279,7 +270,6 @@ function escapeHtml(str) {
     .replace(/'/g, '&#x27;');
 }
 
-// ── Static file server ──
 const MIME_TYPES = {
   '.html': 'text/html',
   '.css': 'text/css',
@@ -309,7 +299,6 @@ function serveStatic(req, res) {
   return true;
 }
 
-// ── Query string parser ──
 function parseQuery(url) {
   const qIndex = url.indexOf('?');
   if (qIndex === -1) return {};
@@ -326,7 +315,6 @@ function parseQuery(url) {
   return obj;
 }
 
-// ── Response helpers ──
 function sendHTML(res, html, status = 200) {
   res.writeHead(status, { 'Content-Type': 'text/html; charset=utf-8' });
   res.end(html);

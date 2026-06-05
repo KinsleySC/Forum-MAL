@@ -48,13 +48,26 @@ function enrichPost(post, userId) {
   return post;
 }
 
-function enrichComment(comment, userId) {
+function enrichComment(comment, userId, postAuthorId) {
   const votes = getVoteCounts(comment.id, 'comment');
   comment.likes = votes.likes;
   comment.dislikes = votes.dislikes;
   comment.userVote = getUserVote(userId, comment.id, 'comment');
   comment.isOwner = userId && comment.user_id === userId;
   comment.timeAgo = timeAgo(comment.created_at);
+
+  const reply = db.get().get(`
+    SELECT r.content, r.created_at, u.username
+    FROM comment_replies r
+    JOIN users u ON r.user_id = u.id
+    WHERE r.comment_id = ?
+  `, [comment.id]);
+  comment.reply = reply || null;
+  comment.hasReply = !!reply;
+  if (reply) comment.reply.timeAgo = timeAgo(reply.created_at);
+
+  comment.canReply = !!(userId && postAuthorId && userId === postAuthorId && !reply);
+
   return comment;
 }
 
@@ -70,7 +83,6 @@ function timeAgo(dateStr) {
   return new Date(dateStr).toLocaleDateString('fr-FR');
 }
 
-// ── Home / List posts ──
 function homePage(req, res) {
   const user = sessionMgr.getUser(req);
 
@@ -132,7 +144,6 @@ function homePage(req, res) {
   sendHTML(res, html);
 }
 
-// ── Create post page ──
 function createPostPage(req, res) {
   const user = sessionMgr.getUser(req);
   if (!user) return redirect(res, '/login');
@@ -141,7 +152,6 @@ function createPostPage(req, res) {
   sendHTML(res, html);
 }
 
-// ── Create post submit ──
 async function createPostSubmit(req, res) {
   const user = sessionMgr.getUser(req);
   if (!user) return redirect(res, '/login');
@@ -204,7 +214,6 @@ async function createPostSubmit(req, res) {
   redirect(res, `/post/${postId}`);
 }
 
-// ── View post ──
 function viewPost(req, res, params) {
   const user = sessionMgr.getUser(req);
   const d = db.get();
@@ -228,7 +237,7 @@ function viewPost(req, res, params) {
     ORDER BY c.created_at ASC
   `, [parseInt(params.id)]);
 
-  comments = comments.map(c => enrichComment(c, user ? user.id : null));
+  comments = comments.map(c => enrichComment(c, user ? user.id : null, post.user_id));
   post.comments = comments;
   post.hasComments = comments.length > 0;
   post.hasImage = !!post.image_path;
@@ -237,7 +246,6 @@ function viewPost(req, res, params) {
   sendHTML(res, renderTemplate('post', { user, post }));
 }
 
-// ── Edit post page ──
 function editPostPage(req, res, params) {
   const user = sessionMgr.getUser(req);
   if (!user) return redirect(res, '/login');
@@ -255,7 +263,6 @@ function editPostPage(req, res, params) {
   sendHTML(res, renderTemplate('edit-post', { user, post, categories, error: '' }));
 }
 
-// ── Edit post submit ──
 async function editPostSubmit(req, res, params) {
   const user = sessionMgr.getUser(req);
   if (!user) return redirect(res, '/login');
@@ -319,7 +326,6 @@ async function editPostSubmit(req, res, params) {
   redirect(res, `/post/${params.id}`);
 }
 
-// ── Delete post ──
 async function deletePost(req, res, params) {
   const user = sessionMgr.getUser(req);
   if (!user) return redirect(res, '/login');
@@ -339,7 +345,6 @@ async function deletePost(req, res, params) {
   redirect(res, '/');
 }
 
-// ── Add comment ──
 async function addComment(req, res, params) {
   const user = sessionMgr.getUser(req);
   if (!user) return redirect(res, '/login');
@@ -358,7 +363,6 @@ async function addComment(req, res, params) {
   redirect(res, `/post/${params.id}#comments`);
 }
 
-// ── Edit comment ──
 async function editComment(req, res, params) {
   const user = sessionMgr.getUser(req);
   if (!user) return redirect(res, '/login');
@@ -377,7 +381,6 @@ async function editComment(req, res, params) {
   redirect(res, `/post/${comment.post_id}#comments`);
 }
 
-// ── Delete comment ──
 async function deleteComment(req, res, params) {
   const user = sessionMgr.getUser(req);
   if (!user) return redirect(res, '/login');
@@ -392,7 +395,6 @@ async function deleteComment(req, res, params) {
   redirect(res, `/post/${comment.post_id}#comments`);
 }
 
-// ── Vote ──
 async function vote(req, res, params) {
   const user = sessionMgr.getUser(req);
   if (!user) return redirect(res, '/login');
@@ -424,8 +426,107 @@ async function vote(req, res, params) {
   redirect(res, referer);
 }
 
+async function replyComment(req, res, params) {
+  const user = sessionMgr.getUser(req);
+  if (!user) return redirect(res, '/login');
+
+  const body = await parseBody(req);
+  const content = (body.content || '').trim();
+  if (!content) return redirect(res, `/post/${params.postId}#comments`);
+
+  const d = db.get();
+  const comment = d.get('SELECT * FROM comments WHERE id = ?', [parseInt(params.commentId)]);
+  if (!comment) return redirect(res, '/');
+
+  const post = d.get('SELECT user_id FROM posts WHERE id = ?', [comment.post_id]);
+
+  if (!post || post.user_id !== user.id) {
+    return sendHTML(res, renderTemplate('error', { user, error: { code: 403, message: 'Seul l\'auteur du post peut répondre' } }), 403);
+  }
+
+  const existing = d.get('SELECT id FROM comment_replies WHERE comment_id = ?', [comment.id]);
+  if (existing) return redirect(res, `/post/${comment.post_id}#comments`);
+
+  d.run('INSERT INTO comment_replies (comment_id, user_id, content) VALUES (?, ?, ?)', [comment.id, user.id, content]);
+  redirect(res, `/post/${comment.post_id}#comments`);
+}
+
+function inboxPage(req, res) {
+  const user = sessionMgr.getUser(req);
+  if (!user) return redirect(res, '/login');
+
+  const d = db.get();
+
+  const conversations = d.all(`
+    SELECT
+      CASE WHEN pm.sender_id = ? THEN pm.receiver_id ELSE pm.sender_id END AS other_id,
+      u.username AS other_username,
+      MAX(pm.created_at) AS last_at,
+      SUM(CASE WHEN pm.receiver_id = ? AND pm.read_at IS NULL THEN 1 ELSE 0 END) AS unread
+    FROM private_messages pm
+    JOIN users u ON u.id = CASE WHEN pm.sender_id = ? THEN pm.receiver_id ELSE pm.sender_id END
+    WHERE pm.sender_id = ? OR pm.receiver_id = ?
+    GROUP BY other_id
+    ORDER BY last_at DESC
+  `, [user.id, user.id, user.id, user.id, user.id]);
+
+  conversations.forEach(function(c) { c.timeAgo = timeAgo(c.last_at); });
+
+  sendHTML(res, renderTemplate('messages', { user, conversations, hasConversations: conversations.length > 0 }));
+}
+
+function conversationPage(req, res, params) {
+  const user = sessionMgr.getUser(req);
+  if (!user) return redirect(res, '/login');
+
+  const otherId = parseInt(params.userId);
+  const d = db.get();
+
+  const other = d.get('SELECT id, username FROM users WHERE id = ?', [otherId]);
+  if (!other) {
+    return sendHTML(res, renderTemplate('error', { user, error: { code: 404, message: 'Utilisateur introuvable' } }), 404);
+  }
+
+  d.run('UPDATE private_messages SET read_at = CURRENT_TIMESTAMP WHERE receiver_id = ? AND sender_id = ? AND read_at IS NULL', [user.id, otherId]);
+
+  const messages = d.all(`
+    SELECT pm.*, u.username AS sender_username
+    FROM private_messages pm
+    JOIN users u ON u.id = pm.sender_id
+    WHERE (pm.sender_id = ? AND pm.receiver_id = ?) OR (pm.sender_id = ? AND pm.receiver_id = ?)
+    ORDER BY pm.created_at ASC
+  `, [user.id, otherId, otherId, user.id]);
+
+  messages.forEach(function(m) {
+    m.isMine = m.sender_id === user.id;
+    m.timeAgo = timeAgo(m.created_at);
+  });
+
+  sendHTML(res, renderTemplate('messages', { user, other, messages, hasMessages: messages.length > 0, isConversation: true }));
+}
+
+async function sendMessage(req, res, params) {
+  const user = sessionMgr.getUser(req);
+  if (!user) return redirect(res, '/login');
+
+  const body = await parseBody(req);
+  const content = (body.content || '').trim();
+  const receiverId = parseInt(params.userId);
+
+  if (!content) return redirect(res, `/messages/${receiverId}`);
+  if (receiverId === user.id) return redirect(res, '/messages');
+
+  const d = db.get();
+  const receiver = d.get('SELECT id FROM users WHERE id = ?', [receiverId]);
+  if (!receiver) return redirect(res, '/messages');
+
+  d.run('INSERT INTO private_messages (sender_id, receiver_id, content) VALUES (?, ?, ?)', [user.id, receiverId, content]);
+  redirect(res, `/messages/${receiverId}`);
+}
+
 module.exports = {
   homePage, createPostPage, createPostSubmit,
   viewPost, editPostPage, editPostSubmit, deletePost,
   addComment, editComment, deleteComment, vote,
+  replyComment, inboxPage, conversationPage, sendMessage,
 };

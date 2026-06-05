@@ -99,8 +99,6 @@ async function init() {
       FOREIGN KEY (comment_id) REFERENCES comments(id) ON DELETE CASCADE
     )
   `);
-
-  // Seed categories
   const cats = ['General', 'Technology', 'Gaming', 'Music', 'Art', 'Science'];
   for (const c of cats) {
     try { db.run('INSERT INTO categories (name) VALUES (?)', [c]); } catch {}
@@ -109,8 +107,6 @@ async function init() {
   save();
   console.log('Database initialized');
 }
-
-// Wrapper to provide a simple sync-like API
 function get() {
   return {
     run(sql, params = []) {

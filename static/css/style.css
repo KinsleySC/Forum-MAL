@@ -1,4 +1,3 @@
-/* ── Reset & Base ── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
@@ -40,8 +39,6 @@ body {
 
 a { color: var(--accent); text-decoration: none; transition: color var(--transition); }
 a:hover { color: var(--accent-hover); }
-
-/* ── Navbar ── */
 .navbar {
   background: var(--bg-card);
   border-bottom: 1px solid var(--border);
@@ -74,8 +71,6 @@ a:hover { color: var(--accent-hover); }
   color: var(--text-muted);
   font-family: var(--font-mono);
 }
-
-/* ── Buttons ── */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -106,8 +101,6 @@ a:hover { color: var(--accent-hover); }
 .btn-sm { padding: 0.35rem 0.75rem; font-size: 0.8rem; }
 .btn-xs { padding: 0.2rem 0.5rem; font-size: 0.75rem; }
 .btn-full { width: 100%; justify-content: center; }
-
-/* ── Container ── */
 .container {
   max-width: 1100px;
   margin: 0 auto;
@@ -115,15 +108,11 @@ a:hover { color: var(--accent-hover); }
   flex: 1;
   width: 100%;
 }
-
-/* ── Home Layout ── */
 .home-layout {
   display: grid;
   grid-template-columns: 220px 1fr;
   gap: 2rem;
 }
-
-/* ── Sidebar ── */
 .sidebar {
   position: sticky;
   top: 72px;
@@ -153,8 +142,6 @@ a:hover { color: var(--accent-hover); }
   color: #111;
   font-weight: 600;
 }
-
-/* ── Feed ── */
 .feed-header {
   display: flex;
   align-items: center;
@@ -162,8 +149,6 @@ a:hover { color: var(--accent-hover); }
   margin-bottom: 1.5rem;
 }
 .feed-header h1 { font-size: 1.5rem; font-weight: 700; }
-
-/* ── Post Card ── */
 .post-card {
   display: flex;
   gap: 1rem;
@@ -269,8 +254,6 @@ a:hover { color: var(--accent-hover); }
   height: 100%;
   object-fit: cover;
 }
-
-/* ── Tags ── */
 .tag, .post-tags a {
   display: inline-block;
   padding: 0.15rem 0.5rem;
@@ -287,8 +270,6 @@ a:hover { color: var(--accent-hover); }
   font-size: 0.8rem;
   color: var(--text-dim);
 }
-
-/* ── Post Full Page ── */
 .post-page { max-width: 750px; margin: 0 auto; }
 .back-link {
   display: inline-block;
@@ -350,8 +331,6 @@ a:hover { color: var(--accent-hover); }
 }
 
 .inline-form { display: inline; }
-
-/* ── Comments ── */
 .comments-section { max-width: 750px; margin: 0 auto; }
 .comments-section h2 {
   font-size: 1.15rem;
@@ -416,8 +395,6 @@ a:hover { color: var(--accent-hover); }
 .form-actions-inline { display: flex; gap: 0.5rem; justify-content: flex-end; }
 
 .empty-comments { color: var(--text-dim); font-style: italic; }
-
-/* ── Auth Pages ── */
 .auth-page {
   display: flex;
   justify-content: center;
@@ -436,8 +413,6 @@ a:hover { color: var(--accent-hover); }
 .auth-subtitle { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem; }
 .auth-form { display: flex; flex-direction: column; gap: 1rem; }
 .auth-footer { text-align: center; margin-top: 1.25rem; font-size: 0.85rem; color: var(--text-muted); }
-
-/* ── Form Pages ── */
 .form-page { display: flex; justify-content: center; }
 .form-card {
   background: var(--bg-card);
@@ -448,8 +423,6 @@ a:hover { color: var(--accent-hover); }
   max-width: 680px;
 }
 .form-card h1 { font-size: 1.4rem; margin-bottom: 1.25rem; }
-
-/* ── Form Elements ── */
 .form-group { display: flex; flex-direction: column; gap: 0.35rem; }
 .form-group label {
   font-size: 0.8rem;
@@ -519,8 +492,6 @@ a:hover { color: var(--accent-hover); }
   margin-top: 0.5rem;
 }
 .post-form { display: flex; flex-direction: column; gap: 1.25rem; }
-
-/* ── Alerts ── */
 .alert {
   padding: 0.75rem 1rem;
   border-radius: var(--radius);
@@ -532,8 +503,6 @@ a:hover { color: var(--accent-hover); }
   border: 1px solid rgba(255, 107, 107, 0.3);
   color: var(--danger);
 }
-
-/* ── Error Page ── */
 .error-page {
   display: flex;
   justify-content: center;
@@ -552,16 +521,12 @@ a:hover { color: var(--accent-hover); }
   margin-bottom: 0.5rem;
 }
 .error-card h1 { font-size: 1.25rem; color: var(--text-muted); margin-bottom: 1.5rem; }
-
-/* ── Empty State ── */
 .empty-state {
   text-align: center;
   padding: 4rem 2rem;
   color: var(--text-dim);
 }
 .empty-state p { margin-bottom: 1rem; font-size: 1rem; }
-
-/* ── Landing Page ── */
 .landing-page {
   display: flex;
   flex-direction: column;
@@ -615,8 +580,6 @@ a:hover { color: var(--accent-hover); }
 .landing-card h2 { font-size: 1.15rem; font-weight: 700; }
 .landing-card p { color: var(--text-muted); font-size: 0.875rem; line-height: 1.5; flex: 1; }
 .landing-card .btn { margin-top: 0.5rem; }
-
-/* ── Footer ── */
 .footer {
   text-align: center;
   padding: 2rem 1rem;
@@ -625,8 +588,6 @@ a:hover { color: var(--accent-hover); }
   border-top: 1px solid var(--border);
   margin-top: auto;
 }
-
-/* ── Responsive ── */
 @media (max-width: 768px) {
   .home-layout { grid-template-columns: 1fr; }
   .sidebar {
@@ -644,8 +605,6 @@ a:hover { color: var(--accent-hover); }
   .auth-card { padding: 1.5rem; }
   .nav-inner { padding: 0 1rem; }
 }
-
-/* ── Double Slider Login/Register ── */
 .slider-page {
   display: flex;
   justify-content: center;
