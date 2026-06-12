@@ -1,9 +1,8 @@
 <div class="home-layout">
-  <!-- Sidebar: filters -->
   <aside class="sidebar">
     <div class="sidebar-section">
-      <h3 class="sidebar-title">Categories</h3>
-      <a href="/" class="filter-link {{#if activeCategory}}{{else}}active{{/if}}">All</a>
+      <h3 class="sidebar-title">Catégories</h3>
+      <a href="/" class="filter-link {{#if activeCategory}}{{else}}active{{/if}}">Tout</a>
       {{#each categories}}
         <a href="/?category={{id}}" class="filter-link" data-cat="{{id}}">{{name}}</a>
       {{/each}}
@@ -11,19 +10,18 @@
 
     {{#if user}}
     <div class="sidebar-section">
-      <h3 class="sidebar-title">My Feed</h3>
-      <a href="/?filter=mine" class="filter-link" data-filter="mine">My Posts</a>
-      <a href="/?filter=liked" class="filter-link" data-filter="liked">Liked Posts</a>
+      <h3 class="sidebar-title">Mon fil d'actualité</h3>
+      <a href="/?filter=mine" class="filter-link" data-filter="mine">Mes Posts</a>
+      <a href="/?filter=liked" class="filter-link" data-filter="liked">Publications aimées</a>
     </div>
     {{/if}}
   </aside>
 
-  <!-- Main content -->
   <div class="feed">
     <div class="feed-header">
       <h1>Posts</h1>
       {{#if user}}
-        <a href="/post/new" class="btn btn-primary">+ New Post</a>
+        <a href="/post/new" class="btn btn-primary">+ Nouveau Post</a>
       {{/if}}
     </div>
 
@@ -67,9 +65,9 @@
       {{/each}}
     {{else}}
       <div class="empty-state">
-        <p>No posts yet.</p>
+        <p>Aucun posts pour l'instant.</p>
         {{#if user}}
-          <a href="/post/new" class="btn btn-primary">Create the first post</a>
+          <a href="/post/new" class="btn btn-primary">Créer le premier post</a>
         {{/if}}
       </div>
     {{/if}}
