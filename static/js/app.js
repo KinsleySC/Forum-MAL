@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
+
   const params = new URLSearchParams(window.location.search);
   const activeCategory = params.get('category');
   const activeFilter = params.get('filter');

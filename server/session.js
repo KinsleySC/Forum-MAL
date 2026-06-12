@@ -3,7 +3,7 @@ const db = require('./database');
 const { parseCookies, setCookie } = require('./utils');
 
 const COOKIE_NAME = 'forum_session';
-const SESSION_HOURS = 24;
+const SESSION_HOURS = 24 * 7;
 
 function createSession(res, userId) {
   const d = db.get();
