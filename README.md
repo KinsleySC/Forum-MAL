@@ -28,10 +28,10 @@ Forum web complet développé en Node.js vanilla (sans framework) avec SQLite.
 docker build -t forum .
 
 # Lancer le conteneur
-docker run -p 8080:8080 forum
+docker run -p 4300:4300 forum
 ```
 
-Le forum est accessible sur **http://localhost:8080**.
+Le forum est accessible sur **http://monavislibre:4300**.
 
 ## Lancement sans Docker
 
@@ -43,28 +43,6 @@ npm install
 npm start
 ```
 
-## Structure du projet
-
-```
-forum/
-├── server/
-│   ├── index.js        # Point d'entrée du serveur HTTP
-│   ├── router.js       # Routeur URL personnalisé
-│   ├── database.js     # Initialisation SQLite + schéma
-│   ├── session.js      # Gestion des sessions/cookies
-│   ├── auth.js         # Handlers inscription/connexion
-│   ├── posts.js        # Handlers posts/commentaires/votes
-│   └── utils.js        # Utilitaires (parsing, templates, etc.)
-├── templates/          # Pages HTML avec template engine
-├── static/
-│   ├── css/style.css   # Styles
-│   ├── js/app.js       # JavaScript client
-│   └── uploads/        # Images uploadées
-├── data/               # Base de données SQLite (auto-créé)
-├── Dockerfile
-├── package.json
-└── README.md
-```
 
 ## Schéma de la base de données
 
